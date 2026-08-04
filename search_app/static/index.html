@@ -3,681 +3,788 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>بحث ذكي عن المحتوى</title>
+  <title>🔥 الباحث الذكي</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:       #0d1117;
-      --surface:  #161b22;
-      --surface2: #21262d;
-      --border:   #30363d;
-      --c-search: #58a6ff;
-      --c-scrape: #3fb950;
-      --c-agent:  #d2a8ff;
-      --c-crawl:  #f78166;
-      --c-osint:  #ffa657;
-      --c-site:   #39d353;
-      --text:     #e6edf3;
-      --muted:    #8b949e;
-      --radius:   12px;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Cairo', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      padding: 24px 16px 40px;
+      color: #fff;
     }
 
-    /* ── Header ── */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 32px 28px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 24px 72px rgba(0,0,0,.55);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.6rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      opacity: .55;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      border-bottom: 2px solid rgba(255,255,255,.06);
+      padding-bottom: 16px;
+      margin-bottom: 26px;
+    }
+    .tab-btn {
+      padding: 10px 26px;
+      border: none;
+      border-radius: 50px;
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.6);
+      font-size: .95rem;
+      font-weight: 600;
+      font-family: 'Tajawal', sans-serif;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 7px;
+      transition: background .2s, color .2s, transform .15s, box-shadow .2s;
     }
-    header .logo {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--c-search), var(--c-osint));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; flex-shrink: 0;
-    }
-    header h1 { font-size: 1.15rem; font-weight: 700; }
-    header p  { font-size: .78rem; color: var(--muted); margin-top: 2px; }
-
-    /* ── Layout ── */
-    main {
-      flex: 1;
-      max-width: 1000px;
-      width: 100%;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
-
-    /* ── Mode tabs ── */
-    .tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .tab {
-      cursor: pointer;
-      padding: .55rem 1.2rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--muted);
-      font-size: .88rem;
-      font-family: inherit;
-      display: flex; align-items: center; gap: .45rem;
-      transition: all .2s;
-    }
-    .tab:hover { color: var(--text); border-color: var(--c-search); }
-    .tab.active                     { background: var(--c-search); border-color: var(--c-search); color: #fff; }
-    .tab[data-mode="scrape"].active { background: var(--c-scrape); border-color: var(--c-scrape); }
-    .tab[data-mode="agent"].active  { background: var(--c-agent);  border-color: var(--c-agent); color: #1a1a2e; }
-    .tab[data-mode="crawl"].active  { background: var(--c-crawl);  border-color: var(--c-crawl); }
-    .tab[data-mode="osint"].active  { background: var(--c-osint);  border-color: var(--c-osint); color: #1a1a2e; }
-    .tab[data-mode="site"].active   { background: var(--c-site);   border-color: var(--c-site);  color: #0d1117; }
-
-    /* ── Input card ── */
-    .input-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .field { display: flex; flex-direction: column; gap: .4rem; }
-    .field label { font-size: .82rem; color: var(--muted); }
-    .field input, .field select {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .7rem 1rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: .95rem;
-      outline: none;
-      transition: border-color .2s;
-      width: 100%;
-    }
-    .field input:focus, .field select:focus { border-color: var(--c-search); }
-    .field input::placeholder { color: var(--muted); }
-    .field select option { background: var(--surface2); }
-
-    .input-row { display: flex; gap: .75rem; align-items: flex-end; }
-    .input-row .field { flex: 1; }
-
-    .osint-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .85rem;
-    }
-
-    button.run {
-      cursor: pointer;
-      padding: .72rem 1.5rem;
-      border-radius: 8px;
-      border: none;
-      background: var(--c-search);
+    .tab-btn:hover {
+      background: rgba(255,255,255,.12);
       color: #fff;
-      font-family: inherit;
-      font-size: .9rem;
-      font-weight: 700;
-      white-space: nowrap;
-      display: flex; align-items: center; gap: .45rem;
-      transition: opacity .2s, transform .1s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+      box-shadow: 0 4px 22px rgba(245,87,108,.35);
+    }
+    .tab-content { display: none; animation: fadeUp .35s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* ── Fields ── */
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .input-group label {
+      min-width: 130px;
+      font-weight: 600;
+      opacity: .8;
+      font-size: .95rem;
+    }
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      flex: 1;
+      min-width: 200px;
+      padding: 11px 16px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      font-size: .97rem;
+      font-family: 'Tajawal', sans-serif;
+      outline: none;
+      transition: border-color .25s, background .25s, box-shadow .25s;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: #f5576c;
+      background: rgba(255,255,255,.12);
+    }
+    .input-group input::placeholder,
+    .input-group textarea::placeholder { color: rgba(255,255,255,.35); }
+    .input-group select option { background: #1a1a2e; color: #fff; }
+    .input-group textarea { min-height: 72px; resize: vertical; }
+    .hint { font-size: .78rem; opacity: .45; width: 100%; margin-top: 2px; }
+
+    /* ── Site-search: URL field activation ── */
+    .site-url-wrap { flex: 1; min-width: 200px; position: relative; }
+    .site-url-wrap input {
+      width: 100%;
+      transition: border-color .3s, box-shadow .3s, background .3s;
+    }
+    .site-url-wrap.active-glow input {
+      border-color: #39d353;
+      background: rgba(57,211,83,.1);
+      box-shadow: 0 0 0 3px rgba(57,211,83,.2), 0 0 18px rgba(57,211,83,.15);
+    }
+    .active-indicator {
+      display: none;
+      position: absolute;
+      top: -22px;
+      right: 0;
+      font-size: .72rem;
+      color: #39d353;
+      font-weight: 600;
+      animation: pulse-txt 1.4s ease-in-out infinite;
+    }
+    .site-url-wrap.active-glow .active-indicator { display: block; }
+    @keyframes pulse-txt {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
+    }
+
+    /* crawl progress strip */
+    .crawl-status {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: rgba(57,211,83,.08);
+      border: 1px solid rgba(57,211,83,.25);
+      border-radius: 10px;
+      font-size: .85rem;
+      color: #39d353;
+      animation: fadeUp .3s ease;
+    }
+    .crawl-status.visible { display: flex; align-items: center; gap: 10px; }
+    .crawl-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #39d353;
+      animation: blink .8s ease-in-out infinite;
       flex-shrink: 0;
     }
-    button.run:hover   { opacity: .88; }
-    button.run:active  { transform: scale(.97); }
-    button.run:disabled { opacity: .45; cursor: not-allowed; }
-    button.run.osint-btn { background: var(--c-osint); color: #1a1a2e; width: 100%; justify-content: center; font-size: 1rem; padding: .85rem; }
-    button.run.site-btn  { background: var(--c-site);  color: #0d1117; width: 100%; justify-content: center; font-size: 1rem; padding: .85rem; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
 
-    /* ── Site search — detected form info badge ── */
-    .detect-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      background: rgba(57,211,83,.12); border: 1px solid var(--c-site);
-      color: var(--c-site); border-radius: 8px;
-      padding: .45rem .85rem; font-size: .78rem;
-      margin-bottom: 1rem; direction: ltr; text-align: left;
-      word-break: break-all;
+    /* ── Execute button ── */
+    .btn-execute {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: 'Tajawal', sans-serif;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+    .btn-execute:hover  { transform: scale(1.02); box-shadow: 0 8px 32px rgba(245,87,108,.45); }
+    .btn-execute:active { transform: scale(.98); }
+    .btn-execute:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* ── Results ── */
-    #results-container { display: flex; flex-direction: column; gap: 1rem; }
+    /* ── Loader ── */
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .loader .spinner {
+      border: 4px solid rgba(255,255,255,.1);
+      border-top-color: #f5576c;
+      border-radius: 50%;
+      width: 52px; height: 52px;
+      animation: spin .75s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader p { opacity: .6; font-size: 1rem; }
 
+    /* ── Results area ── */
+    .results-area { margin-top: 28px; }
+    .results-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .results-stats .count  { font-weight: 700; color: #f093fb; font-size: 1rem; }
+    .results-stats .meta   { opacity: .45; font-size: .85rem; }
+
+    /* ── Result card with thumbnail ── */
     .result-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
-      animation: fadeIn .3s ease;
+      display: flex;
+      gap: 18px;
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border-right: 4px solid #f5576c;
+      align-items: flex-start;
+      transition: background .2s;
+      animation: fadeUp .3s ease;
     }
-    @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform:none;} }
+    .result-card:hover { background: rgba(255,255,255,.07); }
 
-    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: .35rem; }
-    .card-title a { color: var(--c-search); text-decoration: none; }
-    .card-title a:hover { text-decoration: underline; }
-    .card-url { font-size: .76rem; color: var(--c-scrape); margin-bottom: .6rem; word-break: break-all; direction: ltr; text-align: left; }
-    .card-body { color: var(--muted); font-size: .88rem; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+    .result-thumb {
+      flex: 0 0 140px;
+      width: 140px; height: 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .result-thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .result-thumb .no-img { font-size: 2.6rem; opacity: .25; }
 
-    /* ── OSINT Report styles ── */
+    .result-details { flex: 1; min-width: 0; }
+    .result-details .r-title {
+      font-size: 1.1rem; font-weight: 700; color: #f093fb; margin-bottom: 4px;
+    }
+    .result-details .r-title a { color: inherit; text-decoration: none; }
+    .result-details .r-title a:hover { text-decoration: underline; }
+    .result-details .r-url {
+      font-size: .8rem; opacity: .45; word-break: break-all;
+      margin-bottom: 10px; direction: ltr; text-align: left;
+    }
+    .result-details .r-url a { color: #f093fb; text-decoration: none; }
+    .result-details .r-url a:hover { text-decoration: underline; }
+    .result-details .r-body {
+      background: rgba(0,0,0,.25);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: .88rem;
+      line-height: 1.75;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      direction: auto;
+      text-align: start;
+      color: rgba(255,255,255,.8);
+    }
+    .result-details .r-body::-webkit-scrollbar { width: 5px; }
+    .result-details .r-body::-webkit-scrollbar-thumb { background: #f5576c; border-radius: 10px; }
+    .result-details .r-meta {
+      display: flex; gap: 10px; margin-top: 10px;
+      flex-wrap: wrap; font-size: .78rem; opacity: .45;
+    }
+    .result-details .r-meta span {
+      background: rgba(255,255,255,.05); padding: 3px 12px; border-radius: 20px;
+    }
+
+    /* ── keyword highlight in excerpt ── */
+    mark {
+      background: rgba(245,87,108,.35);
+      color: #fff;
+      border-radius: 3px;
+      padding: 0 2px;
+    }
+
+    /* ── OSINT summary card ── */
     .summary-card {
-      background: linear-gradient(135deg, rgba(255,166,87,.08), rgba(88,166,255,.06));
-      border: 1px solid var(--c-osint);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      animation: fadeIn .4s ease;
+      background: linear-gradient(135deg, rgba(240,147,251,.07), rgba(245,87,108,.05));
+      border: 1px solid rgba(240,147,251,.3);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+      animation: fadeUp .4s ease;
     }
     .summary-card .badge {
-      display: inline-flex; align-items: center; gap: .4rem;
-      background: var(--c-osint); color: #1a1a2e;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       font-size: .75rem; font-weight: 700;
-      padding: .2rem .75rem; border-radius: 20px;
-      margin-bottom: .85rem;
+      padding: .2rem .8rem; border-radius: 20px;
+      margin-bottom: 10px;
     }
-    .summary-card .query-line {
-      font-size: .8rem; color: var(--muted); margin-bottom: .75rem;
-      direction: ltr; text-align: left;
-    }
-    .summary-text {
-      font-size: .95rem; line-height: 1.9; white-space: pre-wrap; direction: auto; text-align: start;
-    }
+    .summary-card .adv-query { font-size: .78rem; opacity: .45; margin-bottom: 10px; direction: ltr; text-align: left; }
+    .summary-card .summary-text { font-size: .95rem; line-height: 1.95; white-space: pre-wrap; direction: auto; text-align: start; }
 
-    .source-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      animation: fadeIn .35s ease;
-    }
-    .source-header {
-      padding: 1rem 1.25rem .75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .source-num {
-      display: inline-block;
-      background: var(--surface2);
-      color: var(--c-osint);
-      font-size: .72rem; font-weight: 700;
-      padding: .15rem .6rem; border-radius: 20px;
-      margin-bottom: .5rem;
-    }
-    .source-title { font-weight: 700; font-size: .97rem; margin-bottom: .3rem; }
-    .source-title a { color: var(--c-search); text-decoration: none; }
-    .source-title a:hover { text-decoration: underline; }
-    .source-url { font-size: .74rem; color: var(--c-scrape); word-break: break-all; direction: ltr; text-align: left; }
+    /* ── crawl link list ── */
+    .link-list { list-style: none; }
+    .link-list li { padding: .42rem 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .86rem; direction: ltr; text-align: left; }
+    .link-list li:last-child { border-bottom: none; }
+    .link-list a { color: #f093fb; word-break: break-all; text-decoration: none; }
+    .link-list a:hover { text-decoration: underline; }
 
-    .source-body { padding: 1rem 1.25rem; }
-    .excerpt { font-size: .86rem; color: var(--muted); line-height: 1.75; white-space: pre-wrap; word-break: break-word; direction: auto; text-align: start; }
+    /* ── agent output ── */
+    .agent-pre { background: rgba(0,0,0,.3); padding: 16px; border-radius: 12px; overflow: auto; max-height: 420px; font-size: .88rem; white-space: pre-wrap; direction: auto; text-align: start; }
 
-    /* media grid */
-    .media-section { padding: 0 1.25rem 1.1rem; }
-    .media-label { font-size: .75rem; color: var(--muted); margin-bottom: .6rem; }
-    .img-grid {
-      display: flex; gap: .5rem; flex-wrap: wrap;
+    /* ── Error / empty ── */
+    .error-banner {
+      background: rgba(245,87,108,.12);
+      border: 1px solid #f5576c;
+      color: #f5576c;
+      padding: 14px 20px;
+      border-radius: 12px;
+      margin-top: 16px;
+      text-align: center;
     }
-    .img-grid img {
-      width: 110px; height: 80px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: opacity .2s;
-    }
-    .img-grid img:hover { opacity: .8; }
-    .vid-list { display: flex; flex-direction: column; gap: .5rem; }
-    .vid-item {
-      display: flex; align-items: center; gap: .75rem;
-      background: var(--surface2); border-radius: 8px; padding: .5rem .75rem;
-    }
-    .vid-item img { width: 80px; height: 56px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
-    .vid-item a { color: var(--c-search); font-size: .83rem; word-break: break-all; }
+    .no-results { text-align: center; padding: 50px; opacity: .4; font-size: 1.1rem; }
 
     /* lightbox */
-    #lightbox {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.88); z-index: 999;
-      align-items: center; justify-content: center;
-    }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 999; align-items: center; justify-content: center; }
     #lightbox.open { display: flex; }
-    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
-    #lightbox-close {
-      position: absolute; top: 1.5rem; left: 1.5rem;
-      background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer;
-    }
+    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 10px; }
+    #lb-close { position: absolute; top: 1.5rem; left: 1.5rem; background: none; border: none; color: #fff; font-size: 2.2rem; cursor: pointer; }
 
-    /* link list (crawl) */
-    .link-list { list-style: none; }
-    .link-list li { padding: .4rem 0; border-bottom: 1px solid var(--border); font-size: .86rem; direction: ltr; text-align: left; }
-    .link-list li:last-child { border-bottom: none; }
-    .link-list a { color: var(--c-search); word-break: break-all; }
-
-    .state-msg { text-align: center; color: var(--muted); padding: 3rem 0; font-size: .92rem; }
-    .state-msg .icon { font-size: 2.5rem; margin-bottom: .75rem; }
-    .error-banner { background: rgba(247,129,102,.1); border: 1px solid var(--c-crawl); border-radius: var(--radius); padding: 1rem 1.5rem; color: var(--c-crawl); font-size: .9rem; }
-    .summary-badge { font-size: .8rem; color: var(--muted); margin-bottom: .75rem; }
-    .summary-badge strong { color: var(--text); }
-    .agent-response { font-size: .93rem; line-height: 1.9; color: var(--text); white-space: pre-wrap; direction: auto; text-align: start; }
-
-    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
+    /* ── Responsive ── */
     @media (max-width: 640px) {
-      .osint-grid { grid-template-columns: 1fr; }
-      .input-row { flex-direction: column; }
-      .tabs { gap: .3rem; }
-      .tab { font-size: .8rem; padding: .42rem .85rem; }
+      h1 { font-size: 1.9rem; }
+      .result-card { flex-direction: column; align-items: center; }
+      .result-thumb { flex: 0 0 100px; width: 100%; height: 120px; }
+      .tab-btn { font-size: .82rem; padding: 8px 16px; }
+      .container { padding: 20px 16px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🔍</div>
-  <div>
-    <h1>بحث ذكي عن المحتوى</h1>
-    <p>ابحث، استخرج، وحلّل المحتوى بالذكاء الاصطناعي</p>
-  </div>
-</header>
+<div class="container">
 
-<main>
+  <h1>🔥 الباحث الذكي</h1>
+  <p class="subtitle">ابحث، استخرج، وحلّل — بحث عميق داخل أي موقع بالذكاء الاصطناعي</p>
 
-  <!-- Mode tabs -->
+  <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" data-mode="search">🔍 بحث</button>
-    <button class="tab" data-mode="site">🎯 بحث في موقع</button>
-    <button class="tab" data-mode="scrape">📄 استخراج صفحة</button>
-    <button class="tab" data-mode="agent">🤖 المساعد الذكي</button>
-    <button class="tab" data-mode="crawl">🕷️ زحف الموقع</button>
-    <button class="tab" data-mode="osint">📊 تقرير OSINT</button>
+    <button class="tab-btn active" data-tab="search">🔍 بحث</button>
+    <button class="tab-btn" data-tab="site">🎯 بحث في موقع</button>
+    <button class="tab-btn" data-tab="scrape">📄 استخراج</button>
+    <button class="tab-btn" data-tab="agent">🧠 وكيل ذكي</button>
+    <button class="tab-btn" data-tab="crawl">🕷️ زحف</button>
+    <button class="tab-btn" data-tab="osint">📊 تقرير OSINT</button>
   </div>
 
-  <!-- Input card (rendered dynamically) -->
-  <div class="input-card" id="input-card"></div>
+  <!-- ====== بحث ====== -->
+  <div id="tab-search" class="tab-content active">
+    <div class="input-group">
+      <label>🔎 كلمة البحث</label>
+      <input id="search-query" type="text" placeholder="مثال: تقنية الذكاء الاصطناعي 2025" />
+    </div>
+    <div class="input-group">
+      <label>📊 عدد النتائج</label>
+      <input id="search-limit" type="number" value="10" min="1" max="50" style="max-width:120px;" />
+    </div>
+    <button class="btn-execute" id="btn-search">🔍 ابحث الآن</button>
+  </div>
+
+  <!-- ====== بحث في موقع ====== -->
+  <div id="tab-site" class="tab-content">
+    <div class="input-group">
+      <label>🔎 كلمة البحث</label>
+      <input id="site-query" type="text" placeholder="مثال: الذكاء الاصطناعي" autocomplete="off" />
+    </div>
+    <div class="input-group" style="position:relative; padding-top: 18px;">
+      <label>🌐 رابط الموقع</label>
+      <div class="site-url-wrap" id="site-url-wrap">
+        <span class="active-indicator">🟢 سيتم الزحف والبحث في هذا الموقع…</span>
+        <input id="site-url" type="text" placeholder="مثال: https://aljazeera.net" />
+      </div>
+    </div>
+    <div class="crawl-status" id="crawl-status">
+      <div class="crawl-dot"></div>
+      <span id="crawl-status-text">جارٍ الزحف عبر صفحات الموقع والبحث عن الكلمة المفتاحية…</span>
+    </div>
+    <button class="btn-execute" id="btn-site">🎯 ابحث في كل صفحات الموقع</button>
+  </div>
+
+  <!-- ====== استخراج ====== -->
+  <div id="tab-scrape" class="tab-content">
+    <div class="input-group">
+      <label>🔗 رابط الصفحة</label>
+      <input id="scrape-url" type="url" placeholder="https://example.com/article" />
+    </div>
+    <button class="btn-execute" id="btn-scrape">📄 استخرج المحتوى</button>
+  </div>
+
+  <!-- ====== وكيل ذكي ====== -->
+  <div id="tab-agent" class="tab-content">
+    <div class="input-group">
+      <label>🧠 سؤالك</label>
+      <textarea id="agent-query" placeholder="مثال: ما هي أبرز اتجاهات الذكاء الاصطناعي؟"></textarea>
+    </div>
+    <button class="btn-execute" id="btn-agent">🧠 اسأل الوكيل</button>
+  </div>
+
+  <!-- ====== زحف ====== -->
+  <div id="tab-crawl" class="tab-content">
+    <div class="input-group">
+      <label>🌐 رابط الموقع</label>
+      <input id="crawl-url" type="url" placeholder="https://example.com" />
+    </div>
+    <div class="input-group">
+      <label>📊 الحد الأقصى</label>
+      <input id="crawl-limit" type="number" value="50" min="1" max="200" style="max-width:120px;" />
+    </div>
+    <button class="btn-execute" id="btn-crawl">🕷️ ابدأ الزحف</button>
+  </div>
+
+  <!-- ====== تقرير OSINT ====== -->
+  <div id="tab-osint" class="tab-content">
+    <div class="input-group">
+      <label>🔍 الكلمة المفتاحية</label>
+      <input id="osint-query" type="text" placeholder="مثال: الذكاء الاصطناعي التوليدي 2025" />
+    </div>
+    <div class="input-group">
+      <label>🌐 نطاقات مستهدفة</label>
+      <input id="osint-domains" type="text" placeholder="مثال: .edu .gov wikipedia.org (اختياري)" />
+    </div>
+    <div class="input-group">
+      <label>📅 النطاق الزمني</label>
+      <select id="osint-time">
+        <option value="">مفتوح</option>
+        <option value="d">آخر 24 ساعة</option>
+        <option value="w">آخر أسبوع</option>
+        <option value="m">آخر شهر</option>
+        <option value="y">آخر سنة</option>
+      </select>
+    </div>
+    <button class="btn-execute" id="btn-osint">📊 إنشاء تقرير OSINT</button>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p id="loader-text">جارٍ التنفيذ…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner" id="error-banner" style="display:none;"></div>
 
   <!-- Results -->
-  <div id="results-container">
-    <div class="state-msg"><div class="icon">🌐</div><div>اختر وضع العمل وأدخل استعلامك للبدء</div></div>
+  <div class="results-area" id="results-area" style="display:none;">
+    <div class="results-stats">
+      <span class="count" id="results-count"></span>
+      <span class="meta" id="results-meta"></span>
+    </div>
+    <div id="results-list"></div>
   </div>
 
-</main>
+</div><!-- /container -->
 
 <!-- Lightbox -->
 <div id="lightbox">
-  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightbox-img" src="" alt="" />
+  <button id="lb-close" onclick="closeLB()">✕</button>
+  <img id="lb-img" src="" alt="" />
 </div>
 
 <script>
 const API = '';
-let currentMode = 'search';
 
-// ── Render input card per mode ──────────────────────────────────────────────────
-
-function renderInputCard() {
-  const card = document.getElementById('input-card');
-  if (currentMode === 'site') {
-    card.innerHTML = `
-      <div class="field">
-        <label>🌐 رابط الموقع المستهدف</label>
-        <input id="q-site-url" type="text" placeholder="مثال: https://aljazeera.net أو bbc.com/arabic" />
-      </div>
-      <div class="field">
-        <label>🔍 كلمة البحث</label>
-        <input id="q-site-query" type="text" placeholder="مثال: الذكاء الاصطناعي" />
-      </div>
-      <button class="run site-btn" id="run-btn" onclick="run()">
-        <span id="btn-icon">🎯</span>
-        <span id="btn-text">بحث داخل الموقع</span>
-      </button>`;
-    document.getElementById('q-site-query').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
-    document.getElementById('q-site-url').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
-  } else if (currentMode === 'osint') {
-    card.innerHTML = `
-      <div class="field">
-        <label>🔍 الكلمة المفتاحية أو العبارة</label>
-        <input id="q-main" type="text" placeholder="مثال: الذكاء الاصطناعي التوليدي 2025" />
-      </div>
-      <div class="osint-grid">
-        <div class="field">
-          <label>🌐 نطاقات مستهدفة (اختياري)</label>
-          <input id="q-domains" type="text" placeholder="مثال: .edu .gov wikipedia.org" />
-        </div>
-        <div class="field">
-          <label>📅 النطاق الزمني</label>
-          <select id="q-time">
-            <option value="">مفتوح</option>
-            <option value="d">آخر 24 ساعة</option>
-            <option value="w">آخر أسبوع</option>
-            <option value="m">آخر شهر</option>
-            <option value="y">آخر سنة</option>
-          </select>
-        </div>
-      </div>
-      <button class="run osint-btn" id="run-btn" onclick="run()">
-        <span id="btn-icon">📊</span>
-        <span id="btn-text">إنشاء تقرير OSINT</span>
-      </button>`;
-    document.getElementById('q-main').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
-  } else {
-    const labels = {
-      search: 'أدخل كلمات البحث',
-      scrape: 'أدخل رابط الصفحة',
-      agent:  'اسأل المساعد الذكي',
-      crawl:  'أدخل الرابط الرئيسي للموقع',
-    };
-    const placeholders = {
-      search: 'مثال: تقنية الذكاء الاصطناعي في 2025',
-      scrape: 'https://example.com/article',
-      agent:  'ما هي أبرز اتجاهات الذكاء الاصطناعي؟',
-      crawl:  'https://example.com',
-    };
-    card.innerHTML = `
-      <label style="font-size:.82rem;color:var(--muted)">${labels[currentMode]}</label>
-      <div class="input-row">
-        <div class="field"><input id="query-input" type="text" placeholder="${placeholders[currentMode]}" /></div>
-        <button class="run" id="run-btn" onclick="run()">
-          <span id="btn-icon">▶</span>
-          <span id="btn-text">تنفيذ</span>
-        </button>
-      </div>`;
-    document.getElementById('query-input').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
-  }
-}
-
-// ── Tab switching ───────────────────────────────────────────────────────────────
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentMode = tab.dataset.mode;
-    renderInputCard();
-    showPlaceholder();
+// ── Tab switching ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    hideResults();
   });
 });
 
-renderInputCard();   // initial render
+// ── Site-search activation glow ──────────────────────────────────────────────────
+const siteQueryInput = document.getElementById('site-query');
+const siteUrlWrap    = document.getElementById('site-url-wrap');
+const siteUrlInput   = document.getElementById('site-url');
 
-// ── Helpers ─────────────────────────────────────────────────────────────────────
-
-function showPlaceholder() {
-  document.getElementById('results-container').innerHTML =
-    `<div class="state-msg"><div class="icon">🌐</div><div>اختر وضع العمل وأدخل استعلامك للبدء</div></div>`;
+function updateSiteGlow() {
+  const hasQuery = siteQueryInput.value.trim().length > 0;
+  siteUrlWrap.classList.toggle('active-glow', hasQuery);
 }
+siteQueryInput.addEventListener('input', updateSiteGlow);
 
-function setLoading(on) {
-  const btn = document.getElementById('run-btn');
-  if (!btn) return;
-  btn.disabled = on;
-  const icon = document.getElementById('btn-icon');
-  const txt  = document.getElementById('btn-text');
-  if (currentMode === 'osint') {
-    icon.innerHTML = on ? '<span class="spinner" style="border-top-color:#1a1a2e;border-color:rgba(26,26,46,.3)"></span>' : '📊';
-    txt.textContent = on ? 'جارٍ التحليل...' : 'إنشاء تقرير OSINT';
-  } else if (currentMode === 'site') {
-    icon.innerHTML = on ? '<span class="spinner" style="border-top-color:#0d1117;border-color:rgba(13,17,23,.3)"></span>' : '🎯';
-    txt.textContent = on ? 'جارٍ الكشف والبحث...' : 'بحث داخل الموقع';
-  } else {
-    icon.innerHTML = on ? '<span class="spinner"></span>' : '▶';
-    txt.textContent = on ? 'جارٍ التنفيذ...' : 'تنفيذ';
-  }
-}
-
-function showError(msg) {
-  document.getElementById('results-container').innerHTML =
-    `<div class="error-banner">⚠️ ${esc(msg)}</div>`;
-}
-
+// ── Utilities ────────────────────────────────────────────────────────────────────
 function esc(str) {
   return String(str ?? '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function openLightbox(src) {
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox').classList.add('open');
+function highlightKeyword(text, kw) {
+  if (!kw || !text) return esc(text);
+  const escaped_kw = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return esc(text).replace(new RegExp(`(${escaped_kw})`, 'gi'), '<mark>$1</mark>');
 }
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightbox-img').src = '';
+
+function showLoader(msg) {
+  document.getElementById('loader-text').textContent = msg;
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('error-banner').style.display = 'none';
 }
-document.getElementById('lightbox').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeLightbox();
-});
+function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+function hideResults() {
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('error-banner').style.display = 'none';
+  hideLoader();
+}
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+  hideLoader();
+}
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  if (btn) btn.disabled = on;
+}
 
-// ── Main run ────────────────────────────────────────────────────────────────────
+function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.add('open'); }
+function closeLB()   { document.getElementById('lightbox').classList.remove('open'); document.getElementById('lb-img').src = ''; }
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target===e.currentTarget) closeLB(); });
 
-async function run() {
-  let q = '';
-  if (currentMode === 'osint') {
-    q = (document.getElementById('q-main')?.value || '').trim();
-  } else if (currentMode === 'site') {
-    q = (document.getElementById('q-site-query')?.value || '').trim();
-  } else {
-    q = (document.getElementById('query-input')?.value || '').trim();
+// ── Thumb helper ─────────────────────────────────────────────────────────────────
+function thumbHtml(src, clickable=true) {
+  if (src) {
+    const click = clickable ? `onclick="openLB('${src.replace(/'/g,"\\'")}'"` : '';
+    return `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=no-img>🖼️</span>'" style="cursor:${clickable?'zoom-in':'default'}" ${click} />`;
   }
-  if (!q) return;
-
-  setLoading(true);
-  document.getElementById('results-container').innerHTML =
-    `<div class="state-msg"><span class="spinner" style="width:34px;height:34px;border-width:3px;"></span></div>`;
-
-  try {
-    let body, endpoint;
-
-    if (currentMode === 'search') {
-      endpoint = '/search'; body = { query: q, max_results: 10 };
-    } else if (currentMode === 'site') {
-      const siteUrl = (document.getElementById('q-site-url')?.value || '').trim();
-      if (!siteUrl) { showError('يرجى إدخال رابط الموقع المستهدف'); setLoading(false); return; }
-      endpoint = '/site_search'; body = { site_url: siteUrl, query: q };
-    } else if (currentMode === 'scrape') {
-      endpoint = '/scrape'; body = { url: q };
-    } else if (currentMode === 'agent') {
-      endpoint = '/agent'; body = { query: q };
-    } else if (currentMode === 'crawl') {
-      endpoint = '/crawl'; body = { base_url: q, depth: 2, max_pages: 50 };
-    } else {
-      endpoint = '/report';
-      body = {
-        query: q,
-        domains: (document.getElementById('q-domains')?.value || '').trim(),
-        time_range: document.getElementById('q-time')?.value || '',
-        max_sources: 6,
-      };
-    }
-
-    const res  = await fetch(API + endpoint, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    const data = await res.json();
-
-    if (data.error && !data.sources?.length) { showError(data.error); return; }
-    renderResults(data);
-  } catch(e) {
-    showError(e.message || 'حدث خطأ غير متوقع');
-  } finally {
-    setLoading(false);
-  }
+  return `<span class="no-img">🖼️</span>`;
 }
 
-// ── Render functions ────────────────────────────────────────────────────────────
+// ── Show results ─────────────────────────────────────────────────────────────────
+function showResultsArea(countText, metaText) {
+  document.getElementById('results-count').textContent = countText;
+  document.getElementById('results-meta').textContent  = metaText || '';
+  document.getElementById('results-area').style.display = 'block';
+}
 
-function renderResults(data) {
-  const c = document.getElementById('results-container');
-  c.innerHTML = '';
-
-  if (currentMode === 'search') {
-    const results = data.results || [];
-    if (!results.length) { c.innerHTML = '<div class="state-msg"><div class="icon">😶</div><div>لا توجد نتائج</div></div>'; return; }
-    c.innerHTML = `<div class="summary-badge">تم العثور على <strong>${results.length}</strong> نتيجة</div>`;
-    results.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'result-card';
-      card.innerHTML = `
-        <div class="card-title"><a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title)}</a></div>
-        <div class="card-url">${esc(r.url)}</div>
-        <div class="card-body">${esc(r.snippet)}</div>`;
-      c.appendChild(card);
-    });
-
-  } else if (currentMode === 'scrape') {
-    const text = (data.text || '').trim();
-    if (!text) { c.innerHTML = '<div class="state-msg"><div class="icon">📭</div><div>لم يتم استخراج أي نص</div></div>'; return; }
-    c.innerHTML = `
-      <div class="result-card">
-        <div class="card-title">📄 ${esc(data.url)}</div>
-        <div class="card-body" style="direction:auto;text-align:start;">${esc(text)}</div>
+// ── Render helpers ────────────────────────────────────────────────────────────────
+function renderCards(items, bodyFn, thumbFn) {
+  const list = document.getElementById('results-list');
+  list.innerHTML = '';
+  if (!items.length) { list.innerHTML = '<div class="no-results">😕 لا توجد نتائج لعرضها.</div>'; return; }
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'result-card';
+    div.innerHTML = `
+      <div class="result-thumb">${thumbFn(item)}</div>
+      <div class="result-details">
+        <div class="r-title">${i+1}. ${bodyFn.title(item)}</div>
+        <div class="r-url"><a href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.url)}</a></div>
+        <div class="r-body">${bodyFn.body(item)}</div>
+        ${bodyFn.meta ? `<div class="r-meta">${bodyFn.meta(item)}</div>` : ''}
       </div>`;
-
-  } else if (currentMode === 'agent') {
-    const resp = (data.response || '').trim();
-    if (!resp) { c.innerHTML = '<div class="state-msg"><div class="icon">🤔</div><div>لا يوجد رد</div></div>'; return; }
-    c.innerHTML = `
-      <div class="result-card">
-        <div class="card-title">🤖 رد المساعد</div>
-        <div class="agent-response">${esc(resp)}</div>
-      </div>`;
-
-  } else if (currentMode === 'crawl') {
-    const links = data.links || [];
-    if (!links.length) { c.innerHTML = '<div class="state-msg"><div class="icon">🕸️</div><div>لم يتم العثور على روابط داخلية</div></div>'; return; }
-    const items = links.map(l => `<li><a href="${esc(l)}" target="_blank" rel="noreferrer">${esc(l)}</a></li>`).join('');
-    c.innerHTML = `
-      <div class="summary-badge">تم الزحف على <strong>${links.length}</strong> رابطاً من <strong>${esc(data.base_url)}</strong></div>
-      <div class="result-card"><ul class="link-list">${items}</ul></div>`;
-
-  } else if (currentMode === 'site') {
-    const results = data.results || [];
-    if (!results.length) {
-      c.innerHTML = `<div class="state-msg"><div class="icon">🔎</div><div>${esc(data.error || 'لم يتم العثور على نتائج')}</div></div>`;
-      return;
-    }
-    // Detection info banner
-    const detectHtml = data.method_used
-      ? `<div class="detect-badge">✅ ${esc(data.method_used)}</div>`
-      : '';
-    c.innerHTML = `
-      ${detectHtml}
-      <div class="summary-badge">تم العثور على <strong>${results.length}</strong> نتيجة داخل <strong>${esc(data.site_url)}</strong></div>`;
-    results.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'result-card';
-      card.innerHTML = `
-        <div class="card-title"><a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title)}</a></div>
-        <div class="card-url">${esc(r.url)}</div>
-        ${r.snippet ? `<div class="card-body">${esc(r.snippet)}</div>` : ''}`;
-      c.appendChild(card);
-    });
-
-  } else {
-    renderOsintReport(data);
-  }
-}
-
-function renderOsintReport(data) {
-  const c = document.getElementById('results-container');
-  const sources = data.sources || [];
-
-  // ── Executive summary card ──
-  const summaryCard = document.createElement('div');
-  summaryCard.className = 'summary-card';
-  summaryCard.innerHTML = `
-    <div class="badge">📌 الملخص التنفيذي</div>
-    <div class="query-line">استعلام متقدم: ${esc(data.advanced_query || data.query)}</div>
-    <div class="summary-text">${esc(data.summary || 'لا يوجد ملخص متاح.')}</div>`;
-  c.appendChild(summaryCard);
-
-  if (!sources.length) {
-    c.innerHTML += '<div class="state-msg"><div class="icon">😶</div><div>لم يتم العثور على مصادر</div></div>';
-    return;
-  }
-
-  // Label
-  const label = document.createElement('div');
-  label.className = 'summary-badge';
-  label.innerHTML = `<strong>💎 المصادر الرئيسية المُحللة</strong> — ${sources.length} مصادر`;
-  c.appendChild(label);
-
-  // ── Source cards ──
-  sources.forEach((s, i) => {
-    const card = document.createElement('div');
-    card.className = 'source-card';
-
-    // Header
-    card.innerHTML = `
-      <div class="source-header">
-        <div class="source-num">المصدر ${i + 1}</div>
-        <div class="source-title"><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.title || s.url)}</a></div>
-        <div class="source-url">${esc(s.url)}</div>
-      </div>`;
-
-    // Excerpt
-    const excerpt = (s.excerpt || s.snippet || '').trim();
-    if (excerpt) {
-      const bodyEl = document.createElement('div');
-      bodyEl.className = 'source-body';
-      bodyEl.innerHTML = `<div class="excerpt">${esc(excerpt.slice(0, 600))}${excerpt.length > 600 ? '…' : ''}</div>`;
-      card.appendChild(bodyEl);
-    }
-
-    // Images
-    const images = s.images || [];
-    if (images.length) {
-      const sec = document.createElement('div');
-      sec.className = 'media-section';
-      sec.innerHTML = `<div class="media-label">🖼️ صور مستخرجة</div>`;
-      const grid = document.createElement('div');
-      grid.className = 'img-grid';
-      images.forEach(img => {
-        const el = document.createElement('img');
-        el.src = img.src;
-        el.alt = img.alt || '';
-        el.title = img.alt || '';
-        el.loading = 'lazy';
-        el.onerror = function() { this.style.display='none'; };
-        el.onclick = () => openLightbox(img.src);
-        grid.appendChild(el);
-      });
-      sec.appendChild(grid);
-      card.appendChild(sec);
-    }
-
-    // Videos
-    const videos = s.videos || [];
-    if (videos.length) {
-      const sec = document.createElement('div');
-      sec.className = 'media-section';
-      sec.innerHTML = `<div class="media-label">🎬 فيديوهات مستخرجة</div>`;
-      const list = document.createElement('div');
-      list.className = 'vid-list';
-      videos.forEach(v => {
-        const item = document.createElement('div');
-        item.className = 'vid-item';
-        if (v.thumb) {
-          item.innerHTML += `<img src="${esc(v.thumb)}" alt="thumbnail" loading="lazy" onerror="this.style.display='none'" />`;
-        }
-        const watchUrl = v.watch || v.src;
-        item.innerHTML += `<a href="${esc(watchUrl)}" target="_blank" rel="noreferrer">${esc(watchUrl)}</a>`;
-        list.appendChild(item);
-      });
-      sec.appendChild(list);
-      card.appendChild(sec);
-    }
-
-    c.appendChild(card);
+    list.appendChild(div);
   });
 }
+
+// ── POST helper ───────────────────────────────────────────────────────────────────
+async function post(endpoint, body) {
+  const res = await fetch(API + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+// ── 1. Search ─────────────────────────────────────────────────────────────────────
+async function execSearch() {
+  const q = document.getElementById('search-query').value.trim();
+  if (!q) return;
+  const limit = parseInt(document.getElementById('search-limit').value) || 10;
+  setLoading('btn-search', true);
+  showLoader('🔍 جارٍ البحث…');
+  try {
+    const data = await post('/search', { query: q, max_results: limit });
+    if (data.error) { showError(data.error); return; }
+    const results = data.results || [];
+    showResultsArea(`${results.length} نتيجة`, `بحث: ${q}`);
+    renderCards(results,
+      { title: r => `<a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title)}</a>`,
+        body:  r => esc(r.snippet || '') },
+      r => `<span class="no-img">🔍</span>`
+    );
+  } catch(e) { showError(e.message); }
+  finally { setLoading('btn-search', false); hideLoader(); }
+}
+
+// ── 2. Site search (full crawl) ───────────────────────────────────────────────────
+async function execSite() {
+  const q   = document.getElementById('site-query').value.trim();
+  const url = document.getElementById('site-url').value.trim();
+  if (!q) { showError('أدخل كلمة البحث.'); return; }
+  if (!url) { showError('أدخل رابط الموقع المستهدف.'); return; }
+
+  setLoading('btn-site', true);
+  document.getElementById('crawl-status').classList.add('visible');
+  document.getElementById('crawl-status-text').textContent =
+    `جارٍ الزحف عبر صفحات ${url} والبحث عن «${q}»…`;
+  showLoader(`🎯 يتم زحف جميع صفحات الموقع والبحث عن «${q}»…`);
+
+  try {
+    const data = await post('/site_search', { site_url: url, query: q });
+    document.getElementById('crawl-status').classList.remove('visible');
+    if (data.error && !data.results?.length) { showError(data.error); return; }
+    const results = data.results || [];
+    showResultsArea(
+      `${results.length} صفحة تحتوي على «${q}»`,
+      `تم زحف ${data.site_url}`
+    );
+    renderCards(results,
+      { title: r => `<a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title || r.url)}</a>`,
+        body:  r => highlightKeyword(r.excerpt || '', q),
+        meta:  r => `<span>🌐 ${esc(r.url)}</span>` },
+      r => thumbHtml(r.thumbnail)
+    );
+  } catch(e) {
+    document.getElementById('crawl-status').classList.remove('visible');
+    showError(e.message);
+  }
+  finally { setLoading('btn-site', false); hideLoader(); }
+}
+
+// ── 3. Scrape ─────────────────────────────────────────────────────────────────────
+async function execScrape() {
+  const url = document.getElementById('scrape-url').value.trim();
+  if (!url) return;
+  setLoading('btn-scrape', true);
+  showLoader('📄 جارٍ استخراج الصفحة…');
+  try {
+    const data = await post('/scrape', { url });
+    if (data.error) { showError(data.error); return; }
+    showResultsArea('صفحة مستخرجة', url);
+    const list = document.getElementById('results-list');
+    list.innerHTML = `
+      <div class="result-card">
+        <div class="result-thumb">${thumbHtml(data.thumbnail)}</div>
+        <div class="result-details">
+          <div class="r-title"><a href="${esc(url)}" target="_blank" rel="noreferrer">${esc(data.title || url)}</a></div>
+          <div class="r-url"><a href="${esc(url)}" target="_blank">${esc(url)}</a></div>
+          <div class="r-body">${esc((data.text || '').slice(0,1200))}</div>
+          <div class="r-meta"><span>🖼️ ${(data.images||[]).length} صورة</span><span>🎬 ${(data.videos||[]).length} فيديو</span></div>
+        </div>
+      </div>`;
+  } catch(e) { showError(e.message); }
+  finally { setLoading('btn-scrape', false); hideLoader(); }
+}
+
+// ── 4. Agent ──────────────────────────────────────────────────────────────────────
+async function execAgent() {
+  const q = document.getElementById('agent-query').value.trim();
+  if (!q) return;
+  setLoading('btn-agent', true);
+  showLoader('🧠 جارٍ تشغيل الوكيل الذكي…');
+  try {
+    const data = await post('/agent', { query: q });
+    if (data.error && !data.response) { showError(data.error); return; }
+    showResultsArea('رد الوكيل الذكي', '');
+    document.getElementById('results-list').innerHTML = `
+      <div class="result-card">
+        <div class="result-thumb"><span class="no-img">🧠</span></div>
+        <div class="result-details">
+          <div class="r-title">🧠 ${esc(q)}</div>
+          <div class="r-body agent-pre">${esc(data.response || '')}</div>
+        </div>
+      </div>`;
+  } catch(e) { showError(e.message); }
+  finally { setLoading('btn-agent', false); hideLoader(); }
+}
+
+// ── 5. Crawl ──────────────────────────────────────────────────────────────────────
+async function execCrawl() {
+  const url = document.getElementById('crawl-url').value.trim();
+  if (!url) return;
+  const limit = parseInt(document.getElementById('crawl-limit').value) || 50;
+  setLoading('btn-crawl', true);
+  showLoader('🕷️ جارٍ الزحف…');
+  try {
+    const data = await post('/crawl', { base_url: url, depth: 2, max_pages: limit });
+    if (data.error && !data.links?.length) { showError(data.error); return; }
+    const links = data.links || [];
+    showResultsArea(`${links.length} رابط`, `زحف من ${url}`);
+    const items = links.map(l => `<li><a href="${esc(l)}" target="_blank" rel="noreferrer">${esc(l)}</a></li>`).join('');
+    document.getElementById('results-list').innerHTML =
+      `<div class="result-card" style="border-right-color:#39d353;">
+        <div class="result-details" style="width:100%">
+          <ul class="link-list">${items}</ul>
+        </div>
+      </div>`;
+  } catch(e) { showError(e.message); }
+  finally { setLoading('btn-crawl', false); hideLoader(); }
+}
+
+// ── 6. OSINT report ───────────────────────────────────────────────────────────────
+async function execOsint() {
+  const q = document.getElementById('osint-query').value.trim();
+  if (!q) return;
+  setLoading('btn-osint', true);
+  showLoader('📊 جارٍ بناء التقرير…');
+  try {
+    const data = await post('/report', {
+      query: q,
+      domains: document.getElementById('osint-domains').value.trim(),
+      time_range: document.getElementById('osint-time').value,
+      max_sources: 6,
+    });
+    if (data.error && !data.sources?.length) { showError(data.error); return; }
+    const sources = data.sources || [];
+    showResultsArea(`${sources.length} مصادر`, q);
+    const list = document.getElementById('results-list');
+    list.innerHTML = '';
+    // Summary card
+    if (data.summary) {
+      const s = document.createElement('div');
+      s.className = 'summary-card';
+      s.innerHTML = `
+        <div class="badge">📌 الملخص التنفيذي</div>
+        <div class="adv-query">استعلام: ${esc(data.advanced_query || q)}</div>
+        <div class="summary-text">${esc(data.summary)}</div>`;
+      list.appendChild(s);
+    }
+    sources.forEach((src, i) => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div class="result-thumb">${thumbHtml(src.thumbnail)}</div>
+        <div class="result-details">
+          <div class="r-title">${i+1}. <a href="${esc(src.url)}" target="_blank" rel="noreferrer">${esc(src.title||src.url)}</a></div>
+          <div class="r-url"><a href="${esc(src.url)}" target="_blank">${esc(src.url)}</a></div>
+          <div class="r-body">${esc((src.excerpt||src.snippet||'').slice(0,600))}</div>
+          <div class="r-meta"><span>🖼️ ${(src.images||[]).length} صورة</span><span>🎬 ${(src.videos||[]).length} فيديو</span></div>
+        </div>`;
+      list.appendChild(card);
+    });
+  } catch(e) { showError(e.message); }
+  finally { setLoading('btn-osint', false); hideLoader(); }
+}
+
+// ── Wire up buttons + Enter keys ─────────────────────────────────────────────────
+document.getElementById('btn-search').addEventListener('click', execSearch);
+document.getElementById('btn-site').addEventListener('click', execSite);
+document.getElementById('btn-scrape').addEventListener('click', execScrape);
+document.getElementById('btn-agent').addEventListener('click', execAgent);
+document.getElementById('btn-crawl').addEventListener('click', execCrawl);
+document.getElementById('btn-osint').addEventListener('click', execOsint);
+
+document.getElementById('search-query').addEventListener('keydown', e => { if(e.key==='Enter') execSearch(); });
+document.getElementById('site-query').addEventListener('keydown',   e => { if(e.key==='Enter') execSite();   });
+document.getElementById('site-url').addEventListener('keydown',     e => { if(e.key==='Enter') execSite();   });
+document.getElementById('scrape-url').addEventListener('keydown',   e => { if(e.key==='Enter') execScrape(); });
+document.getElementById('crawl-url').addEventListener('keydown',    e => { if(e.key==='Enter') execCrawl();  });
+document.getElementById('osint-query').addEventListener('keydown',  e => { if(e.key==='Enter') execOsint();  });
+document.getElementById('agent-query').addEventListener('keydown',  e => { if(e.ctrlKey&&e.key==='Enter') execAgent(); });
 </script>
 </body>
 </html>

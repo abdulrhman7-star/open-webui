@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>🔥 الباحث الذكي - مع صور مصغرة متعددة المصادر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* === الأنماط العامة === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.6;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* === قسم المفتاح === */
+        .api-key-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .api-key-section label {
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        .api-key-section input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 1rem;
+            outline: 2px solid transparent;
+            transition: 0.3s;
+        }
+        .api-key-section input:focus {
+            outline-color: #f5576c;
+        }
+        .api-key-section input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .api-key-section button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .api-key-section button:hover {
+            transform: scale(1.05);
+        }
+
+        /* === علامات التبويب === */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255,255,255,0.06);
+            padding-bottom: 15px;
+            justify-content: center;
+        }
+        .tab-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(245,87,108,0.3);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === حقول الإدخال === */
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+            align-items: center;
+        }
+        .input-group label {
+            min-width: 120px;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            outline: 2px solid transparent;
+            transition: 0.3s;
+        }
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline-color: #f5576c;
+            background: rgba(255,255,255,0.12);
+        }
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        .input-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .input-group textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+        .input-group .hint {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            width: 100%;
+            margin-top: 4px;
+        }
+        .input-group .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .input-group .checkbox-group label {
+            min-width: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-weight: 400;
+        }
+        .input-group .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #f5576c;
+            min-width: auto;
+            flex: 0 0 auto;
+        }
+
+        /* === أزرار التنفيذ === */
+        .btn-execute {
+            padding: 16px 50px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Tajawal', sans-serif;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-execute:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(245,87,108,0.4);
+        }
+        .btn-execute:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* === مؤشر التحميل === */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .loader .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #f5576c;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* === منطقة النتائج === */
+        .results-area {
+            margin-top: 30px;
+            display: none;
+        }
+        .results-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+        }
+        .results-stats .count {
+            font-weight: 600;
+            color: #f093fb;
+        }
+        .results-stats .credits {
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+
+        /* === بطاقة النتيجة مع الصورة === */
+        .result-card {
+            display: flex;
+            gap: 18px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            border-right: 4px solid #f5576c;
+            transition: 0.3s;
+            align-items: flex-start;
+        }
+        .result-card:hover {
+            background: rgba(255,255,255,0.07);
+        }
+
+        .result-thumbnail {
+            flex: 0 0 140px;
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+        }
+        .result-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .result-thumbnail .no-image {
+            font-size: 2.5rem;
+            opacity: 0.3;
+            color: #fff;
+        }
+        .result-thumbnail .video-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .result-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .result-details .title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #f093fb;
+            margin-bottom: 4px;
+        }
+        .result-details .url {
+            font-size: 0.85rem;
+            opacity: 0.5;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        .result-details .url a {
+            color: #f093fb;
+            text-decoration: none;
+        }
+        .result-details .url a:hover {
+            text-decoration: underline;
+        }
+        .result-details .content {
+            background: rgba(0,0,0,0.25);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            max-height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+        }
+        .result-details .content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .result-details .content::-webkit-scrollbar-thumb {
+            background: #f5576c;
+            border-radius: 10px;
+        }
+        .result-details .meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+        .result-details .meta span {
+            background: rgba(255,255,255,0.05);
+            padding: 3px 12px;
+            border-radius: 20px;
+        }
+        .result-details .sources {
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        .result-details .sources a {
+            color: #f093fb;
+            text-decoration: none;
+            display: inline-block;
+            margin: 2px 6px 2px 0;
+            padding: 2px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        /* === استجابة للشاشات الصغيرة === */
+        @media (max-width: 650px) {
+            .result-card {
+                flex-direction: column;
+                align-items: center;
+            }
+            .result-thumbnail {
+                flex: 0 0 100px;
+                width: 100px;
+                height: 100px;
+            }
+            .result-details .content {
+                max-height: 120px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            opacity: 0.5;
+            font-size: 1.2rem;
+        }
+        .error-msg {
+            background: rgba(245,87,108,0.15);
+            border: 1px solid #f5576c;
+            color: #f5576c;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.3;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔥 الباحث الذكي</h1>
+    <p class="subtitle">صور مصغرة من مصادر متعددة — اتصال مباشر بـ Firecrawl</p>
+
+    <!-- مفتاح API -->
+    <div class="api-key-section">
+        <label>🔑 مفتاح API:</label>
+        <input type="password" id="apiKeyInput" placeholder="fc-YourKeyHere" />
+        <button id="saveKeyBtn">💾 حفظ</button>
+        <span style="font-size:0.8rem; opacity:0.4;">(يُخزن في المتصفح)</span>
+    </div>
+
+    <!-- التبويبات -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="search">🔍 بحث</button>
+        <button class="tab-btn" data-tab="scrape">📄 استخراج</button>
+        <button class="tab-btn" data-tab="agent">🧠 وكيل</button>
+        <button class="tab-btn" data-tab="crawl">🕷️ زحف</button>
+    </div>
+
+    <!-- ====== تبويب: بحث ====== -->
+    <div id="tab-search" class="tab-content active">
+        <div class="input-group">
+            <label>🔎 كلمة البحث</label>
+            <input type="text" id="search-query" placeholder="مثال: Eva Hamieh" />
+        </div>
+        <div class="input-group">
+            <label>📊 العدد</label>
+            <input type="number" id="search-limit" value="10" min="1" max="50" />
+        </div>
+        <div class="input-group">
+            <label>🌐 نطاقات</label>
+            <input type="text" id="search-domains" placeholder="x.com, wikipedia.org" />
+            <span class="hint">افصل بفاصلة، اترك فارغاً للبحث في كل الويب</span>
+        </div>
+        <div class="input-group">
+            <label>📦 الصيغ</label>
+            <select id="search-formats" multiple size="4">
+                <option value="markdown" selected>📝 Markdown</option>
+                <option value="html" selected>🌐 HTML</option>
+                <option value="links" selected>🔗 روابط</option>
+                <option value="screenshot">🖼️ لقطة شاشة</option>
+                <option value="images">🖼️ قائمة الصور</option>
+            </select>
+            <span class="hint">اضغط Ctrl/⌘ للتعدد — اختيار "لقطة شاشة" أو "قائمة الصور" يستهلك رصيداً إضافياً</span>
+        </div>
+        <div class="input-group">
+            <label>⚙️</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="search-main-content" checked /> المحتوى الرئيسي فقط</label>
+            </div>
+        </div>
+        <button class="btn-execute" id="btn-search">🔍 ابحث</button>
+    </div>
+
+    <!-- ====== تبويب: استخراج ====== -->
+    <div id="tab-scrape" class="tab-content">
+        <div class="input-group">
+            <label>🔗 الرابط</label>
+            <input type="url" id="scrape-url" placeholder="https://example.com" />
+        </div>
+        <div class="input-group">
+            <label>📦 الصيغ</label>
+            <select id="scrape-formats" multiple size="4">
+                <option value="markdown" selected>📝 Markdown</option>
+                <option value="html" selected>🌐 HTML</option>
+                <option value="links" selected>🔗 روابط</option>
+                <option value="screenshot">🖼️ لقطة شاشة</option>
+                <option value="images">🖼️ قائمة الصور</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>⏳ العمر الأقصى</label>
+            <input type="number" id="scrape-maxage" value="86400000" />
+            <span class="hint">بالمللي ثانية (86400000 = 24 ساعة)</span>
+        </div>
+        <div class="input-group">
+            <label>⚙️</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="scrape-main-content" checked /> المحتوى الرئيسي فقط</label>
+            </div>
+        </div>
+        <button class="btn-execute" id="btn-scrape">📄 استخرج</button>
+    </div>
+
+    <!-- ====== تبويب: وكيل ====== -->
+    <div id="tab-agent" class="tab-content">
+        <div class="input-group">
+            <label>🧠 الوصف</label>
+            <textarea id="agent-prompt" placeholder="مثال: من هي إيفا حميه؟"></textarea>
+        </div>
+        <div class="input-group">
+            <label>🔗 روابط مساعدة</label>
+            <input type="text" id="agent-urls" placeholder="https://x.com/EvaHamieh" />
+            <span class="hint">اختياري، افصل بفاصلة</span>
+        </div>
+        <div class="input-group">
+            <label>🧠 النموذج</label>
+            <select id="agent-model">
+                <option value="spark-1-mini">⚡ spark-1-mini</option>
+                <option value="spark-1-pro">🚀 spark-1-pro</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>📋 مخطط JSON</label>
+            <textarea id="agent-schema" placeholder='{"type":"object","properties":{"name":{"type":"string"}}}'></textarea>
+            <span class="hint">اختياري، لبنية بيانات محددة</span>
+        </div>
+        <button class="btn-execute" id="btn-agent">🧠 شغّل الوكيل</button>
+    </div>
+
+    <!-- ====== تبويب: زحف (بحث شامل) ====== -->
+    <div id="tab-crawl" class="tab-content">
+        <div class="input-group">
+            <label>🔎 كلمة البحث</label>
+            <input type="text" id="crawl-query" placeholder="مثال: Eva Hamieh" />
+            <span class="hint">أدخل كلمة للبحث عنها في النطاق المحدد</span>
+        </div>
+        <div class="input-group">
+            <label>🕷️ رابط الموقع (اختياري)</label>
+            <input type="url" id="crawl-url" placeholder="https://x.com" />
+            <span class="hint">لزحف كلاسيكي، أو لتحديد النطاق مع كلمة البحث</span>
+        </div>
+        <div class="input-group">
+            <label>🌐 نطاقات محددة</label>
+            <input type="text" id="crawl-domains" placeholder="x.com, wikipedia.org" />
+            <span class="hint">يُستخدم مع كلمة البحث</span>
+        </div>
+        <div class="input-group">
+            <label>📊 العدد</label>
+            <input type="number" id="crawl-limit" value="50" min="1" max="500" />
+        </div>
+        <div class="input-group">
+            <label>📦 الصيغ</label>
+            <select id="crawl-formats" multiple size="4">
+                <option value="markdown" selected>📝 Markdown</option>
+                <option value="html">🌐 HTML</option>
+                <option value="links">🔗 روابط</option>
+                <option value="screenshot">🖼️ لقطة شاشة</option>
+                <option value="images">🖼️ قائمة الصور</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>⚙️</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="crawl-main-content" checked /> المحتوى الرئيسي فقط</label>
+            </div>
+        </div>
+        <button class="btn-execute" id="btn-crawl">🕷️ ابدأ الزحف / البحث الشامل</button>
+    </div>
+
+    <!-- ====== منطقة النتائج ====== -->
+    <div id="results-area" class="results-area">
+        <div class="results-stats">
+            <span class="count" id="results-count">0 نتيجة</span>
+            <span class="credits" id="results-credits">🪙 0 رصيد</span>
+        </div>
+        <div id="results-list"></div>
+    </div>
+
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p id="loader-text">جاري التنفيذ...</p>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+    <div class="footer">🔒 المفتاح يُخزن محلياً فقط · ⚠️ للتجربة فقط · الصور من ogImage, Twitter, screenshot, images</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- جافا سكريبت -->
+<!-- ============================================================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ---------- إدارة المفتاح ----------
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+    const savedKey = localStorage.getItem('firecrawl_api_key');
+    if (savedKey) apiKeyInput.value = savedKey;
+
+    saveKeyBtn.addEventListener('click', function() {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+            localStorage.setItem('firecrawl_api_key', key);
+            alert('✅ تم حفظ المفتاح في المتصفح.');
+        } else {
+            alert('⚠️ الرجاء إدخال المفتاح.');
+        }
+    });
+
+    // ---------- دوال مساعدة ----------
+    function getApiKey() {
+        const key = apiKeyInput.value.trim();
+        if (!key) {
+            showError('يرجى إدخال مفتاح API أولاً ثم حفظه.');
+            return null;
+        }
+        return key;
+    }
+
+    function getSelected(selectId) {
+        const sel = document.getElementById(selectId);
+        return Array.from(sel.selectedOptions).map(o => o.value);
+    }
+
+    function getCheck(id) {
+        return document.getElementById(id).checked;
+    }
+
+    function getVal(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function parseComma(str) {
+        return str.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    function parseJson(str) {
+        try { return JSON.parse(str); } catch { return null; }
+    }
+
+    function showLoader(msg) {
+        document.getElementById('loader-text').textContent = msg;
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('results-area').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'none';
+    }
+
+    function hideLoader() {
+        document.getElementById('loader').style.display = 'none';
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error-msg');
+        el.textContent = '⚠️ ' + msg;
+        el.style.display = 'block';
+        document.getElementById('results-area').style.display = 'none';
+        hideLoader();
+    }
+
+    function escapeHtml(t) {
+        if (!t) return '';
+        const d = document.createElement('div');
+        d.textContent = t;
+        return d.innerHTML;
+    }
+
+    // ---------- استخراج الصورة المصغرة من مصادر متعددة ----------
+    function extractThumbnail(item) {
+        // قائمة بالمصادر المحتملة (مرتبة حسب الأفضلية)
+        const candidates = [
+            // 1. من metadata
+            item.metadata?.ogImage,
+            item.metadata?.twitterImage,
+            item.metadata?.image,
+            item.metadata?.thumbnail,
+            // 2. لقطة الشاشة (إن وجدت)
+            item.screenshot,
+            // 3. أول صورة من قائمة images
+            (Array.isArray(item.images) && item.images.length > 0) ? item.images[0] : null,
+            // 4. استخراج أول صورة من markdown (على صورة ![]())
+            (() => {
+                if (item.markdown) {
+                    const match = item.markdown.match(/!\[.*?\]\((.*?)\)/);
+                    return match ? match[1] : null;
+                }
+                return null;
+            })()
+        ];
+
+        for (let src of candidates) {
+            if (src && typeof src === 'string' && src.trim().length > 0) {
+                return src.trim();
+            }
+        }
+        return null;
+    }
+
+    // ---------- عرض النتائج مع الصور المصغرة ----------
+    function displayResults(data) {
+        hideLoader();
+        const area = document.getElementById('results-area');
+        area.style.display = 'block';
+        const list = document.getElementById('results-list');
+        const count = document.getElementById('results-count');
+        const credits = document.getElementById('results-credits');
+
+        if (!data.success) {
+            showError(data.error || 'حدث خطأ غير معروف');
+            return;
+        }
+
+        let items = [];
+        if (data.type === 'search' || data.type === 'crawl') {
+            items = data.results || [];
+        } else if (data.type === 'scrape') {
+            items = data.result ? [data.result] : [];
+        } else if (data.type === 'agent') {
+            // الوكيل – نعرض النتيجة بدون صور مصغرة
+            const resultData = data.result || {};
+            const sources = data.sources || [];
+            let html = '';
+            if (typeof resultData === 'object') {
+                html = '<pre style="background:rgba(0,0,0,0.3);padding:15px;border-radius:10px;overflow:auto;max-height:400px;">' 
+                       + escapeHtml(JSON.stringify(resultData, null, 2)) + '</pre>';
+            } else {
+                html = '<div class="content">' + escapeHtml(String(resultData)) + '</div>';
+            }
+            if (sources.length) {
+                html += '<div class="sources"><strong>📚 المصادر:</strong> ';
+                sources.forEach(s => { html += `<a href="${s}" target="_blank">${s}</a> `; });
+                html += '</div>';
+            }
+            list.innerHTML = `
+                <div class="result-card">
+                    <div class="result-details">
+                        <div class="title">🧠 نتيجة الوكيل الذكي</div>
+                        ${html}
+                        <div class="meta">
+                            <span>🪙 الرصيد المستخدم: ${data.credits_used || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            count.textContent = '1 نتيجة (وكيل)';
+            credits.textContent = `🪙 ${data.credits_used || 0}`;
+            return;
+        }
+
+        // إذا لم توجد نتائج
+        if (!items || items.length === 0) {
+            list.innerHTML = `<div class="no-results">😕 لا توجد نتائج لعرضها.</div>`;
+            count.textContent = '0 نتيجة';
+            credits.textContent = `🪙 ${data.credits_used || 0}`;
+            return;
+        }
+
+        // بناء بطاقات النتائج
+        let html = '';
+        items.forEach((item, idx) => {
+            const title = item.title || 'بدون عنوان';
+            const url = item.url || '#';
+            let content = item.markdown || item.html || 'لا يوجد محتوى نصي.';
+            content = content.replace(/<[^>]*>/g, ''); // إزالة علامات HTML
+            const links = item.links || [];
+            const meta = item.metadata || {};
+
+            // استخراج الصورة المصغرة
+            const thumb = extractThumbnail(item);
+            const thumbHtml = thumb
+                ? `<img src="${escapeHtml(thumb)}" alt="صورة مصغرة" loading="lazy" onerror="this.style.display='none'" />`
+                : `<span class="no-image">🖼️</span>`;
+
+            // التحقق من وجود فيديو (اختياري)
+            let videoBadge = '';
+            if (item.metadata?.ogType === 'video' || (item.html && item.html.includes('<video'))) {
+                videoBadge = '<span class="video-badge">▶ فيديو</span>';
+            }
+
+            html += `
+                <div class="result-card">
+                    <div class="result-thumbnail">
+                        ${thumbHtml}
+                        ${videoBadge}
+                    </div>
+                    <div class="result-details">
+                        <div class="title">${idx+1}. ${escapeHtml(title)}</div>
+                        <div class="url"><a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a></div>
+                        <div class="content">${escapeHtml(content.substring(0, 800))}${content.length > 800 ? '...' : ''}</div>
+                        <div class="meta">
+                            <span>🔗 ${links.length} رابط</span>
+                            ${meta.statusCode ? `<span>📊 الحالة: ${meta.statusCode}</span>` : ''}
+                            ${meta.contentType ? `<span>📄 ${meta.contentType}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        list.innerHTML = html;
+        count.textContent = `${items.length} نتيجة`;
+        credits.textContent = `🪙 ${data.credits_used || 0}`;
+    }
+
+    // ---------- الاتصال بـ Firecrawl API ----------
+    async function callFirecrawl(endpoint, body) {
+        const key = getApiKey();
+        if (!key) throw new Error('مفتاح API غير موجود');
+        const url = `https://api.firecrawl.dev/v2/${endpoint}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${key}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || `خطأ في الطلب (${response.status})`);
+        }
+        return data;
+    }
+
+    // ---------- دوال التنفيذ لكل تبويب ----------
+    // 1. بحث
+    async function executeSearch() {
+        const query = getVal('search-query');
+        if (!query) { showError('أدخل كلمة بحث.'); return; }
+        const limit = parseInt(getVal('search-limit')) || 10;
+        const domains = parseComma(getVal('search-domains'));
+        const formats = getSelected('search-formats');
+        const onlyMain = getCheck('search-main-content');
+
+        showLoader('🔍 جاري البحث...');
+        try {
+            const body = {
+                query,
+                limit,
+                includeDomains: domains.length ? domains : undefined,
+                scrapeOptions: {
+                    formats,
+                    onlyMainContent: onlyMain
+                }
+            };
+            const data = await callFirecrawl('search', body);
+            const results = data.data?.web || [];
+            displayResults({
+                success: true,
+                type: 'search',
+                results,
+                credits_used: data.creditsUsed || 0
+            });
+        } catch (e) {
+            showError(e.message);
+        }
+    }
+
+    // 2. استخراج
+    async function executeScrape() {
+        const url = getVal('scrape-url');
+        if (!url) { showError('أدخل رابطاً.'); return; }
+        const formats = getSelected('scrape-formats');
+        const onlyMain = getCheck('scrape-main-content');
+        const maxAge = parseInt(getVal('scrape-maxage')) || 86400000;
+
+        showLoader('📄 جاري الاستخراج...');
+        try {
+            const body = {
+                url,
+                formats,
+                onlyMainContent: onlyMain,
+                maxAge
+            };
+            const data = await callFirecrawl('scrape', body);
+            displayResults({
+                success: true,
+                type: 'scrape',
+                result: data,
+                credits_used: data.creditsUsed || 0
+            });
+        } catch (e) {
+            showError(e.message);
+        }
+    }
+
+    // 3. وكيل
+    async function executeAgent() {
+        const prompt = getVal('agent-prompt');
+        if (!prompt) { showError('أدخل الوصف المطلوب.'); return; }
+        const urls = parseComma(getVal('agent-urls'));
+        const model = getVal('agent-model');
+        const schemaStr = getVal('agent-schema');
+        const schema = schemaStr ? parseJson(schemaStr) : null;
+
+        showLoader('🧠 جاري تشغيل الوكيل الذكي...');
+        try {
+            const body = { prompt, urls, model };
+            if (schema) body.schema = schema;
+            const data = await callFirecrawl('agent', body);
+            displayResults({
+                success: true,
+                type: 'agent',
+                result: data.data,
+                sources: data.sources || [],
+                credits_used: data.creditsUsed || 0
+            });
+        } catch (e) {
+            showError(e.message);
+        }
+    }
+
+    // 4. زحف (بحث شامل)
+    async function executeCrawl() {
+        const query = getVal('crawl-query');
+        const url = getVal('crawl-url');
+        const domains = parseComma(getVal('crawl-domains'));
+        if (!query && !url) {
+            showError('أدخل كلمة بحث أو رابطاً.');
+            return;
+        }
+
+        const limit = parseInt(getVal('crawl-limit')) || 50;
+        const formats = getSelected('crawl-formats');
+        const onlyMain = getCheck('crawl-main-content');
+
+        // إذا كان هناك كلمة بحث → استخدم البحث مع scrapeOptions
+        if (query) {
+            showLoader(`🔍 جاري البحث عن "${query}" وجلب المحتوى الكامل...`);
+            try {
+                const body = {
+                    query,
+                    limit,
+                    includeDomains: domains.length ? domains : (url ? [new URL(url).hostname] : undefined),
+                    scrapeOptions: {
+                        formats,
+                        onlyMainContent: onlyMain
+                    }
+                };
+                const data = await callFirecrawl('search', body);
+                const results = data.data?.web || [];
+                displayResults({
+                    success: true,
+                    type: 'crawl',
+                    results,
+                    credits_used: data.creditsUsed || 0
+                });
+            } catch (e) {
+                showError(e.message);
+            }
+            return;
+        }
+
+        // وإلا → زحف كلاسيكي
+        if (url) {
+            showLoader('🕷️ جاري الزحف الكلاسيكي... قد يستغرق وقتاً.');
+            try {
+                const body = {
+                    url,
+                    limit,
+                    scrapeOptions: {
+                        formats,
+                        onlyMainContent: onlyMain
+                    }
+                };
+                const data = await callFirecrawl('crawl', body);
+                const results = data.data || [];
+                displayResults({
+                    success: true,
+                    type: 'crawl',
+                    results,
+                    credits_used: data.creditsUsed || 0
+                });
+            } catch (e) {
+                showError(e.message);
+            }
+        }
+    }
+
+    // ---------- ربط الأزرار والتبويبات ----------
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+            // إخفاء النتائج السابقة عند تغيير التبويب
+            document.getElementById('results-area').style.display = 'none';
+            document.getElementById('error-msg').style.display = 'none';
+        });
+    });
+
+    document.getElementById('btn-search').addEventListener('click', executeSearch);
+    document.getElementById('btn-scrape').addEventListener('click', executeScrape);
+    document.getElementById('btn-agent').addEventListener('click', executeAgent);
+    document.getElementById('btn-crawl').addEventListener('click', executeCrawl);
+
+    // دعم Enter في الحقول الرئيسية
+    document.getElementById('search-query').addEventListener('keypress', e => {
+        if (e.key === 'Enter') executeSearch();
+    });
+    document.getElementById('scrape-url').addEventListener('keypress', e => {
+        if (e.key === 'Enter') executeScrape();
+    });
+    document.getElementById('crawl-query').addEventListener('keypress', e => {
+        if (e.key === 'Enter') executeCrawl();
+    });
+    document.getElementById('crawl-url').addEventListener('keypress', e => {
+        if (e.key === 'Enter') executeCrawl();
+    });
+    // دعم Ctrl+Enter في منطقة الوكيل
+    document.getElementById('agent-prompt').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            executeAgent();
+        }
+    });
+
+    console.log('🔥 الباحث الذكي جاهز مع الصور المصغرة متعددة المصادر!');
+});
+</script>
+</body>
+</html>
