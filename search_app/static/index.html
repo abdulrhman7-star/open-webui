@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بحث ذكي عن المحتوى</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #21262d;
+      --border:    #30363d;
+      --accent:    #58a6ff;
+      --accent2:   #3fb950;
+      --accent3:   #f78166;
+      --accent4:   #d2a8ff;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    12px;
+      --shadow:    0 8px 32px rgba(0,0,0,.4);
+    }
+
+    body {
+      font-family: 'Cairo', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header .logo {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent4));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    header h1 { font-size: 1.2rem; font-weight: 700; }
+    header p  { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Layout ── */
+    main {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Mode tabs ── */
+    .tabs {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      cursor: pointer;
+      padding: .55rem 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: .9rem;
+      font-family: inherit;
+      display: flex; align-items: center; gap: .5rem;
+      transition: all .2s;
+    }
+    .tab:hover { color: var(--text); border-color: var(--accent); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .tab[data-mode="scrape"].active  { background: var(--accent2); border-color: var(--accent2); }
+    .tab[data-mode="agent"].active   { background: var(--accent4); border-color: var(--accent4); }
+    .tab[data-mode="crawl"].active   { background: var(--accent3); border-color: var(--accent3); }
+
+    /* ── Input card ── */
+    .input-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .input-card label {
+      display: block;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+    .input-row {
+      display: flex;
+      gap: .75rem;
+    }
+    .input-row input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .input-row input:focus { border-color: var(--accent); }
+    .input-row input::placeholder { color: var(--muted); }
+
+    button.run {
+      cursor: pointer;
+      padding: .75rem 1.6rem;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: inherit;
+      font-size: .95rem;
+      font-weight: 600;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: .5rem;
+      transition: opacity .2s, transform .1s;
+    }
+    button.run:hover   { opacity: .9; }
+    button.run:active  { transform: scale(.97); }
+    button.run:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Results ── */
+    #results-container { display: flex; flex-direction: column; gap: 1rem; }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .result-card .card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: .4rem;
+      color: var(--accent);
+    }
+    .result-card .card-title a { color: inherit; text-decoration: none; }
+    .result-card .card-title a:hover { text-decoration: underline; }
+    .result-card .card-url  {
+      font-size: .78rem;
+      color: var(--accent2);
+      margin-bottom: .6rem;
+      word-break: break-all;
+      direction: ltr;
+      text-align: left;
+    }
+    .result-card .card-body {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* link list (crawl) */
+    .link-list { list-style: none; }
+    .link-list li {
+      padding: .45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .88rem;
+      direction: ltr;
+      text-align: left;
+    }
+    .link-list li:last-child { border-bottom: none; }
+    .link-list a { color: var(--accent); word-break: break-all; }
+
+    /* error / empty */
+    .state-msg {
+      text-align: center;
+      color: var(--muted);
+      padding: 3rem 0;
+      font-size: .95rem;
+    }
+    .state-msg .icon { font-size: 2.5rem; margin-bottom: .75rem; }
+    .error-banner {
+      background: rgba(247,129,102,.12);
+      border: 1px solid var(--accent3);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      color: var(--accent3);
+      font-size: .9rem;
+    }
+
+    /* spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* summary badge */
+    .summary-badge {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .summary-badge strong { color: var(--text); }
+
+    /* agent card rich text */
+    .agent-response {
+      font-size: .95rem;
+      line-height: 1.9;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 600px) {
+      .input-row { flex-direction: column; }
+      .tabs { gap: .35rem; }
+      .tab { font-size: .82rem; padding: .45rem .9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔍</div>
+  <div>
+    <h1>بحث ذكي عن المحتوى</h1>
+    <p>ابحث، استخرج، وحلّل المحتوى بالذكاء الاصطناعي</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- Mode tabs -->
+  <div class="tabs">
+    <button class="tab active" data-mode="search">🔍 بحث</button>
+    <button class="tab" data-mode="scrape">📄 استخراج صفحة</button>
+    <button class="tab" data-mode="agent">🤖 المساعد الذكي</button>
+    <button class="tab" data-mode="crawl">🕷️ زحف الموقع</button>
+  </div>
+
+  <!-- Input card -->
+  <div class="input-card">
+    <label id="input-label">أدخل كلمات البحث</label>
+    <div class="input-row">
+      <input id="query-input" type="text" placeholder="مثال: تقنية الذكاء الاصطناعي في 2025" />
+      <button class="run" id="run-btn" onclick="run()">
+        <span id="btn-icon">▶</span>
+        <span id="btn-text">تنفيذ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-container">
+    <div class="state-msg">
+      <div class="icon">🌐</div>
+      <div>اختر وضع العمل وأدخل استعلامك للبدء</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const API = '';   // same origin
+
+  let currentMode = 'search';
+
+  const modeConfig = {
+    search:  { label: 'أدخل كلمات البحث',           placeholder: 'مثال: تقنية الذكاء الاصطناعي في 2025' },
+    scrape:  { label: 'أدخل رابط الصفحة',            placeholder: 'https://example.com/article' },
+    agent:   { label: 'اسأل المساعد الذكي',          placeholder: 'مثال: ما هي أبرز اتجاهات الذكاء الاصطناعي؟' },
+    crawl:   { label: 'أدخل الرابط الرئيسي للموقع', placeholder: 'https://example.com' },
+  };
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentMode = tab.dataset.mode;
+      const cfg = modeConfig[currentMode];
+      document.getElementById('input-label').textContent = cfg.label;
+      document.getElementById('query-input').placeholder = cfg.placeholder;
+      document.getElementById('query-input').value = '';
+      showPlaceholder();
+    });
+  });
+
+  document.getElementById('query-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') run();
+  });
+
+  function showPlaceholder() {
+    document.getElementById('results-container').innerHTML = `
+      <div class="state-msg">
+        <div class="icon">🌐</div>
+        <div>اختر وضع العمل وأدخل استعلامك للبدء</div>
+      </div>`;
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('run-btn');
+    btn.disabled = on;
+    document.getElementById('btn-icon').innerHTML = on ? '<span class="spinner"></span>' : '▶';
+    document.getElementById('btn-text').textContent = on ? 'جارٍ التنفيذ...' : 'تنفيذ';
+  }
+
+  function showError(msg) {
+    document.getElementById('results-container').innerHTML =
+      `<div class="error-banner">⚠️ ${msg}</div>`;
+  }
+
+  async function run() {
+    const q = document.getElementById('query-input').value.trim();
+    if (!q) return;
+    setLoading(true);
+    document.getElementById('results-container').innerHTML = `<div class="state-msg"><span class="spinner" style="width:32px;height:32px;border-width:3px;"></span></div>`;
+
+    try {
+      let body, endpoint;
+
+      if (currentMode === 'search') {
+        endpoint = '/search';
+        body = { query: q, max_results: 10 };
+      } else if (currentMode === 'scrape') {
+        endpoint = '/scrape';
+        body = { url: q };
+      } else if (currentMode === 'agent') {
+        endpoint = '/agent';
+        body = { query: q };
+      } else {
+        endpoint = '/crawl';
+        body = { base_url: q, depth: 2, max_pages: 50 };
+      }
+
+      const res = await fetch(API + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (data.error) { showError(data.error); return; }
+
+      renderResults(data);
+    } catch (e) {
+      showError(e.message || 'حدث خطأ غير متوقع');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderResults(data) {
+    const container = document.getElementById('results-container');
+    container.innerHTML = '';
+
+    if (currentMode === 'search') {
+      const results = data.results || [];
+      if (!results.length) { container.innerHTML = '<div class="state-msg"><div class="icon">😶</div><div>لا توجد نتائج</div></div>'; return; }
+      container.innerHTML = `<div class="summary-badge">تم العثور على <strong>${results.length}</strong> نتيجة</div>`;
+      results.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        card.innerHTML = `
+          <div class="card-title"><a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title)}</a></div>
+          <div class="card-url">${esc(r.url)}</div>
+          <div class="card-body">${esc(r.snippet)}</div>`;
+        container.appendChild(card);
+      });
+
+    } else if (currentMode === 'scrape') {
+      const text = (data.text || '').trim();
+      if (!text) { container.innerHTML = '<div class="state-msg"><div class="icon">📭</div><div>لم يتم استخراج أي نص</div></div>'; return; }
+      container.innerHTML = `
+        <div class="result-card">
+          <div class="card-title">📄 ${esc(data.url)}</div>
+          <div class="card-body" style="direction:auto;text-align:start;">${esc(text)}</div>
+        </div>`;
+
+    } else if (currentMode === 'agent') {
+      const resp = (data.response || '').trim();
+      if (!resp) { container.innerHTML = '<div class="state-msg"><div class="icon">🤔</div><div>لا يوجد رد</div></div>'; return; }
+      container.innerHTML = `
+        <div class="result-card">
+          <div class="card-title">🤖 رد المساعد</div>
+          <div class="agent-response" style="direction:auto;text-align:start;">${esc(resp)}</div>
+        </div>`;
+
+    } else {
+      const links = data.links || [];
+      if (!links.length) { container.innerHTML = '<div class="state-msg"><div class="icon">🕸️</div><div>لم يتم العثور على روابط داخلية</div></div>'; return; }
+      const listItems = links.map(l => `<li><a href="${esc(l)}" target="_blank" rel="noreferrer">${esc(l)}</a></li>`).join('');
+      container.innerHTML = `
+        <div class="summary-badge">تم الزحف على <strong>${links.length}</strong> رابطاً من <strong>${esc(data.base_url)}</strong></div>
+        <div class="result-card">
+          <ul class="link-list">${listItems}</ul>
+        </div>`;
+    }
+  }
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
