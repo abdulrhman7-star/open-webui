@@ -19,6 +19,7 @@
       --c-agent:  #d2a8ff;
       --c-crawl:  #f78166;
       --c-osint:  #ffa657;
+      --c-site:   #39d353;
       --text:     #e6edf3;
       --muted:    #8b949e;
       --radius:   12px;
@@ -81,6 +82,7 @@
     .tab[data-mode="agent"].active  { background: var(--c-agent);  border-color: var(--c-agent); color: #1a1a2e; }
     .tab[data-mode="crawl"].active  { background: var(--c-crawl);  border-color: var(--c-crawl); }
     .tab[data-mode="osint"].active  { background: var(--c-osint);  border-color: var(--c-osint); color: #1a1a2e; }
+    .tab[data-mode="site"].active   { background: var(--c-site);   border-color: var(--c-site);  color: #0d1117; }
 
     /* ── Input card ── */
     .input-card {
@@ -139,6 +141,17 @@
     button.run:active  { transform: scale(.97); }
     button.run:disabled { opacity: .45; cursor: not-allowed; }
     button.run.osint-btn { background: var(--c-osint); color: #1a1a2e; width: 100%; justify-content: center; font-size: 1rem; padding: .85rem; }
+    button.run.site-btn  { background: var(--c-site);  color: #0d1117; width: 100%; justify-content: center; font-size: 1rem; padding: .85rem; }
+
+    /* ── Site search — detected form info badge ── */
+    .detect-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(57,211,83,.12); border: 1px solid var(--c-site);
+      color: var(--c-site); border-radius: 8px;
+      padding: .45rem .85rem; font-size: .78rem;
+      margin-bottom: 1rem; direction: ltr; text-align: left;
+      word-break: break-all;
+    }
 
     /* ── Results ── */
     #results-container { display: flex; flex-direction: column; gap: 1rem; }
@@ -283,6 +296,7 @@
   <!-- Mode tabs -->
   <div class="tabs">
     <button class="tab active" data-mode="search">🔍 بحث</button>
+    <button class="tab" data-mode="site">🎯 بحث في موقع</button>
     <button class="tab" data-mode="scrape">📄 استخراج صفحة</button>
     <button class="tab" data-mode="agent">🤖 المساعد الذكي</button>
     <button class="tab" data-mode="crawl">🕷️ زحف الموقع</button>
@@ -313,7 +327,23 @@ let currentMode = 'search';
 
 function renderInputCard() {
   const card = document.getElementById('input-card');
-  if (currentMode === 'osint') {
+  if (currentMode === 'site') {
+    card.innerHTML = `
+      <div class="field">
+        <label>🌐 رابط الموقع المستهدف</label>
+        <input id="q-site-url" type="text" placeholder="مثال: https://aljazeera.net أو bbc.com/arabic" />
+      </div>
+      <div class="field">
+        <label>🔍 كلمة البحث</label>
+        <input id="q-site-query" type="text" placeholder="مثال: الذكاء الاصطناعي" />
+      </div>
+      <button class="run site-btn" id="run-btn" onclick="run()">
+        <span id="btn-icon">🎯</span>
+        <span id="btn-text">بحث داخل الموقع</span>
+      </button>`;
+    document.getElementById('q-site-query').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+    document.getElementById('q-site-url').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+  } else if (currentMode === 'osint') {
     card.innerHTML = `
       <div class="field">
         <label>🔍 الكلمة المفتاحية أو العبارة</label>
@@ -396,6 +426,9 @@ function setLoading(on) {
   if (currentMode === 'osint') {
     icon.innerHTML = on ? '<span class="spinner" style="border-top-color:#1a1a2e;border-color:rgba(26,26,46,.3)"></span>' : '📊';
     txt.textContent = on ? 'جارٍ التحليل...' : 'إنشاء تقرير OSINT';
+  } else if (currentMode === 'site') {
+    icon.innerHTML = on ? '<span class="spinner" style="border-top-color:#0d1117;border-color:rgba(13,17,23,.3)"></span>' : '🎯';
+    txt.textContent = on ? 'جارٍ الكشف والبحث...' : 'بحث داخل الموقع';
   } else {
     icon.innerHTML = on ? '<span class="spinner"></span>' : '▶';
     txt.textContent = on ? 'جارٍ التنفيذ...' : 'تنفيذ';
@@ -430,6 +463,8 @@ async function run() {
   let q = '';
   if (currentMode === 'osint') {
     q = (document.getElementById('q-main')?.value || '').trim();
+  } else if (currentMode === 'site') {
+    q = (document.getElementById('q-site-query')?.value || '').trim();
   } else {
     q = (document.getElementById('query-input')?.value || '').trim();
   }
@@ -444,6 +479,10 @@ async function run() {
 
     if (currentMode === 'search') {
       endpoint = '/search'; body = { query: q, max_results: 10 };
+    } else if (currentMode === 'site') {
+      const siteUrl = (document.getElementById('q-site-url')?.value || '').trim();
+      if (!siteUrl) { showError('يرجى إدخال رابط الموقع المستهدف'); setLoading(false); return; }
+      endpoint = '/site_search'; body = { site_url: siteUrl, query: q };
     } else if (currentMode === 'scrape') {
       endpoint = '/scrape'; body = { url: q };
     } else if (currentMode === 'agent') {
@@ -517,6 +556,29 @@ function renderResults(data) {
     c.innerHTML = `
       <div class="summary-badge">تم الزحف على <strong>${links.length}</strong> رابطاً من <strong>${esc(data.base_url)}</strong></div>
       <div class="result-card"><ul class="link-list">${items}</ul></div>`;
+
+  } else if (currentMode === 'site') {
+    const results = data.results || [];
+    if (!results.length) {
+      c.innerHTML = `<div class="state-msg"><div class="icon">🔎</div><div>${esc(data.error || 'لم يتم العثور على نتائج')}</div></div>`;
+      return;
+    }
+    // Detection info banner
+    const detectHtml = data.method_used
+      ? `<div class="detect-badge">✅ ${esc(data.method_used)}</div>`
+      : '';
+    c.innerHTML = `
+      ${detectHtml}
+      <div class="summary-badge">تم العثور على <strong>${results.length}</strong> نتيجة داخل <strong>${esc(data.site_url)}</strong></div>`;
+    results.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div class="card-title"><a href="${esc(r.url)}" target="_blank" rel="noreferrer">${esc(r.title)}</a></div>
+        <div class="card-url">${esc(r.url)}</div>
+        ${r.snippet ? `<div class="card-body">${esc(r.snippet)}</div>` : ''}`;
+      c.appendChild(card);
+    });
 
   } else {
     renderOsintReport(data);

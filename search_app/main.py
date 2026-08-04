@@ -45,6 +45,10 @@ class ReportRequest(BaseModel):
     time_range: str = ""       # "d" | "w" | "m" | "y" | ""
     max_sources: int = 6
 
+class SiteSearchRequest(BaseModel):
+    site_url: str              # target website homepage URL
+    query: str                 # keyword to search within that site
+
 # ── Shared helpers ───────────────────────────────────────────────────────────────
 
 HEADERS = {
@@ -156,6 +160,130 @@ def _is_internal(base: str, link: str) -> bool:
     base_host = urlparse(base).netloc
     link_host = urlparse(link).netloc
     return link_host == "" or link_host == base_host
+
+
+# Common search parameter names used by websites
+_SEARCH_PARAMS = ["q", "query", "search", "s", "keyword", "keywords", "term",
+                  "text", "searchterm", "p", "find", "k", "searchquery"]
+
+# Fallback URL patterns to probe when no form is found
+_FALLBACK_PATTERNS = [
+    "/search?q={q}",
+    "/?s={q}",
+    "/search?query={q}",
+    "/?q={q}",
+    "/search?keyword={q}",
+    "/search?text={q}",
+    "/index.php?s={q}",
+]
+
+
+def _detect_search_form(homepage_url: str) -> dict | None:
+    """
+    Fetch the homepage and detect the site's search form.
+    Returns {"action": str, "param": str} or None if not found.
+    """
+    try:
+        resp = requests.get(homepage_url, headers=HEADERS, timeout=12)
+        resp.raise_for_status()
+    except Exception:
+        return None
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    parsed = urlparse(homepage_url)
+    base = f"{parsed.scheme}://{parsed.netloc}"
+
+    # Search all <form> elements
+    for form in soup.find_all("form"):
+        method = (form.get("method") or "get").lower()
+        if method not in ("get", ""):
+            continue
+
+        # Look for a search-like input inside this form
+        for inp in form.find_all("input"):
+            name = (inp.get("name") or "").lower()
+            itype = (inp.get("type") or "text").lower()
+            if itype in ("submit", "button", "hidden", "checkbox", "radio"):
+                continue
+            if name in _SEARCH_PARAMS or itype == "search":
+                action = form.get("action") or homepage_url
+                action = urljoin(base, action).split("?")[0]
+                return {"action": action, "param": inp.get("name") or "q"}
+
+    # Check for a standalone <input type="search"> outside a form
+    for inp in soup.find_all("input", {"type": "search"}):
+        name = inp.get("name") or "q"
+        return {"action": base + "/search", "param": name}
+
+    return None
+
+
+def _fetch_search_results(search_url: str, query: str) -> list[dict]:
+    """
+    Fetch a search-results page and extract result items
+    (title, url, snippet) from it.
+    """
+    try:
+        resp = requests.get(search_url, headers=HEADERS, timeout=15)
+        resp.raise_for_status()
+    except Exception as e:
+        return []
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    base = f"{urlparse(search_url).scheme}://{urlparse(search_url).netloc}"
+
+    results = []
+    seen_urls: set[str] = set()
+
+    # Strategy 1 — structured containers: article / li / div with class hints
+    containers = soup.find_all(
+        lambda tag: tag.name in ("article", "li", "div") and
+        any(k in " ".join(tag.get("class", [])).lower()
+            for k in ("result", "post", "item", "entry", "search", "hit", "card")),
+        limit=30,
+    )
+
+    for container in containers:
+        a = container.find("a", href=True)
+        if not a:
+            continue
+        href = urljoin(base, a["href"]).split("#")[0]
+        if href in seen_urls or href == base:
+            continue
+        seen_urls.add(href)
+
+        title = a.get_text(strip=True) or a.get("title", "")
+        # Snippet: any <p> or descriptive text in the container
+        snippet_tag = container.find("p") or container.find(
+            lambda t: t.name in ("span", "div") and len(t.get_text(strip=True)) > 40
+        )
+        snippet = snippet_tag.get_text(strip=True) if snippet_tag else ""
+
+        if title and len(title) > 4:
+            results.append({"title": title, "url": href, "snippet": snippet})
+        if len(results) >= 15:
+            break
+
+    # Strategy 2 — fallback: collect all <a> tags with meaningful text
+    if len(results) < 3:
+        for a in soup.find_all("a", href=True):
+            href = urljoin(base, a["href"]).split("#")[0]
+            if not href.startswith("http"):
+                continue
+            # Must be on the same host
+            if urlparse(href).netloc != urlparse(base).netloc:
+                continue
+            if href in seen_urls or href == base:
+                continue
+            title = a.get_text(strip=True)
+            if len(title) < 5 or len(title) > 200:
+                continue
+            seen_urls.add(href)
+            results.append({"title": title, "url": href, "snippet": ""})
+            if len(results) >= 15:
+                break
+
+    return results
 
 
 def _build_advanced_query(query: str, domains: str) -> str:
@@ -394,6 +522,72 @@ async def report(req: ReportRequest):
         "advanced_query": advanced_query,
         "summary": summary,
         "sources": sources,
+    }
+
+
+@app.post("/site_search")
+async def site_search(req: SiteSearchRequest):
+    """
+    Search within a specific website by:
+    1. Detecting the site's own search form (action URL + param name).
+    2. Submitting the query through it and scraping the results page.
+    3. Falling back to common URL patterns if no form is found.
+    Returns list of {title, url, snippet} plus metadata about how we searched.
+    """
+    site_url = req.site_url.strip().rstrip("/")
+    if not site_url.startswith("http"):
+        site_url = "https://" + site_url
+
+    parsed = urlparse(site_url)
+    base = f"{parsed.scheme}://{parsed.netloc}"
+
+    # ── Step 1: detect search form ───────────────────────────────────────────────
+    form_info = await asyncio.to_thread(_detect_search_form, site_url)
+
+    tried_urls: list[str] = []
+    results: list[dict] = []
+    method_used = ""
+
+    if form_info:
+        # Build URL from detected form
+        from urllib.parse import urlencode, quote_plus
+        search_url = form_info["action"] + "?" + urlencode({form_info["param"]: req.query})
+        tried_urls.append(search_url)
+        method_used = f"نموذج بحث مكتشف — المعامل: {form_info['param']}"
+        results = await asyncio.to_thread(_fetch_search_results, search_url, req.query)
+
+    # ── Step 2: fallback patterns if form not found or returned 0 results ───────
+    if not results:
+        from urllib.parse import quote_plus
+        q_encoded = quote_plus(req.query)
+        for pattern in _FALLBACK_PATTERNS:
+            candidate = base + pattern.replace("{q}", q_encoded)
+            if candidate in tried_urls:
+                continue
+            tried_urls.append(candidate)
+            candidate_results = await asyncio.to_thread(
+                _fetch_search_results, candidate, req.query
+            )
+            if candidate_results:
+                results = candidate_results
+                method_used = f"نمط URL احتياطي: {pattern}"
+                break
+
+    if not results:
+        return {
+            "error": "لم يتم العثور على نتائج. قد يتطلب الموقع تسجيل دخول أو يستخدم بحثًا ديناميكيًا.",
+            "tried_urls": tried_urls,
+            "results": [],
+            "method_used": method_used,
+        }
+
+    return {
+        "site_url": site_url,
+        "query": req.query,
+        "method_used": method_used,
+        "tried_urls": tried_urls,
+        "total": len(results),
+        "results": results,
     }
 
 
