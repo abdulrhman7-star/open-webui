@@ -1,0 +1,56 @@
+I need you to build a full-stack Python web application that acts as an interface for intelligent content search (e.g., tweets and articles). The application must have a backend using FastAPI and a frontend with a single HTML page (a single-page application) that supports Arabic.
+
+**Exact Functionality Requirements (Required Functions):**
+
+1. **`app.search(query)`**:
+
+- Searches for keywords entered by the user (e.g., searching for tweets or articles).
+
+- Must use a real search source (e.g., DuckDuckGo API via the `duckduckgo-search` library, SerpAPI via an API key, or simulate a search using a GET request to a public search engine with results extracted).
+
+- Returns a list of results containing (title, URL, snippet).
+
+2. **`app.scrape(url)`**:
+
+- Receives a single web page URL from the user. - Scrapes the full text content of that page (using `requests` and `BeautifulSoup`).
+
+- Returns the extracted text, cleaned of unnecessary code.
+
+3. **`app.agent(query)`**:
+
+- Acts as a "smart agent" to answer user queries.
+
+- Adds the ability to use the OpenAI API via an environment variable (`OPENAI_API_KEY`).
+
+- Returns the user's text response, images, and videos.
+
+4. **`app.crawl(base_url)`**:
+
+- Receives a URL from a main website.
+
+- Crawls all internal pages linked to this website (to a depth of one or two levels) using a simple BFS algorithm.
+
+- Returns a list of all internal links found.
+
+**Technical and Operational Requirements:**
+
+- Use **FastAPI** to build the following endpoints:
+
+- `POST /search`
+
+- `POST /scrape`
+
+- `POST /agent`
+
+- `POST /crawl`
+- **CORS** support must be added to enable front-end connectivity.
+
+- AI should handle all operations (Search, Scrape, Agent, Crawl).
+
+- An input field for entering keywords or links.
+
+- An "Execute" button to display results.
+
+- The results display area must support rich text.
+
+- The design must be modern, simple, and responsive, with right-to-left (RTL) support for Arabic.
